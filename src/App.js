@@ -25,7 +25,7 @@ const name = ['Crystal', 'Tiffany', 'Amber','Brandy', 'Lola',
 'Scarlett', 'Bambi', 'Star', 'Paris', 'Dallas', 'Diamond',
 'Skye', 'Trinity', 'Tawny', 'Layla', 'Lexie', 'Roxy', 'Prosche',
 'Nevaeh', 'Ashlynn', 'Aspen', 'Chyna', 'Lexus', 'Unique',
-'Chardonnay', 'HHouston', 'London', 'Coco', 'Luscious', 'Capri',
+'Chardonnay', 'Houston', 'London', 'Coco', 'Luscious', 'Capri',
 'Trixie', 'Cinnamon', 'Fifi'];
 
 const icon = ['face', 'two'];
@@ -84,6 +84,23 @@ for (let i = 0; i < clubs.length; i++) {
 
 console.log({clubs});
 
+function applyFilters() {
+  let filtered = [];
+  for (let i = 0; i < clubs.length; i++) {
+    const club = {
+      name: clubs[i].name,
+      girls: clubs[i].girls,
+      filtered: clubs[i].girls.filter(next => {
+        return next.ethnicity === 'White';
+      })
+    };
+
+    filtered.push(club);
+  }
+
+  return filtered;
+}
+
 // import './App.css';
 
 const useStyles = makeStyles(theme => ({
@@ -101,8 +118,10 @@ const useStyles = makeStyles(theme => ({
 function App() {
   const classes = useStyles();
 
-  const items = clubs.map(club => {
-    const girls = club.girls.map(girl => (
+  const filtered = applyFilters();
+
+  const items = filtered.map(club => {
+    const girls = club.filtered.map(girl => (
       <span>
         {girl.name}
       </span>
@@ -110,7 +129,7 @@ function App() {
     return (
       <div key={club.name}>
         <div>{club.name}</div>
-        <div>{club.girls.length} Girls</div>
+        <div>{club.filtered.length} / {club.girls.length} Girls</div>
         <div>
           {girls}
         </div>
