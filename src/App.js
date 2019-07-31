@@ -3,103 +3,25 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
 
-const enthicity = [
-  'American Indian',
-  'Asian',
-  'Black',
-  'Hispanic',
-  'Pacific Islander',
-  'White'
-];
+import FormLabel from '@material-ui/core/FormLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Checkbox from '@material-ui/core/Checkbox';
 
-const bust = ['A', 'B', 'C', 'D', 'E+'];
-
-const name = ['Crystal', 'Tiffany', 'Amber','Brandy', 'Lola',
-'Angel', 'Ginger', 'Candy', 'Charity', 'Anistasia', 'Cherry',
-'Kitty', 'Jade', 'Destiny', 'Devon', 'Chastity', 'Raven',
-'Scarlett', 'Bambi', 'Star', 'Paris', 'Dallas', 'Diamond',
-'Skye', 'Trinity', 'Tawny', 'Layla', 'Lexie', 'Roxy', 'Prosche',
-'Nevaeh', 'Ashlynn', 'Aspen', 'Chyna', 'Lexus', 'Unique',
-'Chardonnay', 'Houston', 'London', 'Coco', 'Luscious', 'Capri',
-'Trixie', 'Cinnamon', 'Fifi'];
-
-const icon = ['face', 'two'];
-
-function random(max) {
-  return Math.floor(Math.random() * max);
-}
-
-function randomItem(items) {
-  return items[random(items.length)];
-}
-
-function generateRandomGirl() {
-  return {
-    name: randomItem(name),
-    ethnicity: randomItem(enthicity),
-    bust: randomItem(bust),
-    height: 145 + random(50),   // cm
-    icon: randomItem(icon)
-  }
-}
-
-
-const clubs = [
-  { name: 'Deja Vu' },
-  { name: 'Airport Strip' },
-  { name: 'New Locomotion' },
-  { name: 'Midway Invader' },
-  { name: 'Diamonds' },
-  { name: 'Pure Gold' },
-  { name: 'Cafe Atlantis' },
-  { name: 'Million Dollar' },
-  { name: 'Brass Rail' },
-  { name: 'Bliss Gentlemens Lounge' },
-  { name: 'Filmores' },
-  { name: 'For Your Eyes Only' },
-  { name: 'House of Lancaster' },
-  { name: 'Landing Strip' },
-  { name: 'Zanzibar' },
-  { name: 'Club Paradise' },
-  { name: 'Remingtons' },
-  { name: 'Upper Brass' },
-  { name: 'Backstage Theatre' },
-  { name: 'Whiskey A-Go-Go' },
-  { name: 'Club Pro' }
-];
-
-for (let i = 0; i < clubs.length; i++) {
-  const girls = 10 + random(10);
-  const club = clubs[i];
-
-  club.girls = [];
-  for (let j = 0; j < girls; j++)
-    club.girls.push(generateRandomGirl());
-}
-
+import { clubs } from './data';
 console.log({clubs});
-
-function applyFilters() {
-  let filtered = [];
-  for (let i = 0; i < clubs.length; i++) {
-    const club = {
-      name: clubs[i].name,
-      girls: clubs[i].girls,
-      filtered: clubs[i].girls.filter(next => {
-        return next.ethnicity === 'White';
-      })
-    };
-
-    filtered.push(club);
-  }
-
-  return filtered;
-}
 
 // import './App.css';
 
@@ -116,26 +38,69 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function App() {
+  const [filterOpen, setFilterOpen] = React.useState(false);
+  const [state, setState] = React.useState({
+    native: true,
+    asian: true,
+    black: true,
+    hispanic: true,
+    pacific: true,
+    white: true
+  });
+
+  function applyFilters(state) {
+    let filtered = [];
+    for (let i = 0; i < clubs.length; i++) {
+      const club = {
+        name: clubs[i].name,
+        members: clubs[i].members,
+        filtered: clubs[i].members.filter(next => {
+          console.log(state[next.ethnicity])
+          return state[next.ethnicity];
+        })
+      };
+
+      filtered.push(club);
+    }
+
+    return filtered;
+  }
+
+
   const classes = useStyles();
 
-  const filtered = applyFilters();
+  const filtered = applyFilters(state);
 
   const items = filtered.map(club => {
-    const girls = club.filtered.map(girl => (
+    const members = club.filtered.map(member => (
       <span>
-        {girl.name}
+        {member.name}
       </span>
     ));
     return (
       <div key={club.name}>
         <div>{club.name}</div>
-        <div>{club.filtered.length} / {club.girls.length} Girls</div>
+        <div>{club.filtered.length} / {club.members.length} Members</div>
         <div>
-          {girls}
+          {members}
         </div>
       </div>
     );
   });
+
+  function handleClickFilter() {
+    setFilterOpen(true);
+  }
+
+  function handleCloseFilter() {
+    // applyFilters(state);
+    setFilterOpen(false);
+  }
+
+  const handleChange = name => event => {
+    setState({ ...state, [name]: event.target.checked });
+  };
+
 
   return (
     <div className={classes.root}>
@@ -147,9 +112,79 @@ function App() {
           <Typography variant="h6" className={classes.title}>
             Clubs
           </Typography>
-          <Button color="inherit">Filter</Button>
+          <Button color="inherit" onClick={handleClickFilter}>Filter</Button>
         </Toolbar>
       </AppBar>
+      <Dialog open={filterOpen} onClose={handleCloseFilter} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Filter</DialogTitle>
+        <DialogContent>
+          <FormControl component="fieldset" className={classes.formControl}>
+            <FormLabel component="legend">Ethnicity</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox checked={state.native} onChange={handleChange('native')} value="native" />}
+                label="American Indian"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.asian} onChange={handleChange('asian')} value="asian" />}
+                label="Asian"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.black} onChange={handleChange('black')} value="black" />}
+                label="Black"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.hispanic} onChange={handleChange('hispanic')} value="hispanic" />}
+                label="Hispanic"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.pacific} onChange={handleChange('pacific')} value="pacific" />}
+                label="Pacific Islander"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.white} onChange={handleChange('white')} value="white" />}
+                label="White"
+              />
+            </FormGroup>
+          </FormControl>
+
+          {/* <FormControl component="fieldset" className={classes.formControl}>
+            <FormLabel component="legend">Ethnicity</FormLabel>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox checked={state.native} onChange={handleChange('native')} value="native" />}
+                label="American Indian"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.asian} onChange={handleChange('asian')} value="asian" />}
+                label="Asian"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.black} onChange={handleChange('black')} value="black" />}
+                label="Black"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.hsipanic} onChange={handleChange('hispanic')} value="hispanic" />}
+                label="Hispanic"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.pacific} onChange={handleChange('pacific')} value="pacific" />}
+                label="Pacific Islander"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={state.white} onChange={handleChange('white')} value="white" />}
+                label="White"
+              />
+            </FormGroup>
+          </FormControl> */}
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseFilter} color="primary">
+            Apply
+          </Button>
+        </DialogActions>
+      </Dialog>
       {items}
     </div>
   );
