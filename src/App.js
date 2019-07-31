@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
+// import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -17,8 +17,10 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
+// import FormHelperText from '@material-ui/core/FormHelperText';
 import Checkbox from '@material-ui/core/Checkbox';
+
+import Slider from '@material-ui/core/Slider';
 
 import { clubs } from './data';
 console.log({clubs});
@@ -47,16 +49,18 @@ function App() {
     pacific: true,
     white: true
   });
+  const [height, setHeight] = React.useState([0, 100]);
+  const [age, setAge] = React.useState([0, 100]);
 
-  function applyFilters(state) {
+  function applyFilters(state, height) {
     let filtered = [];
     for (let i = 0; i < clubs.length; i++) {
       const club = {
         name: clubs[i].name,
         members: clubs[i].members,
         filtered: clubs[i].members.filter(next => {
-          console.log(state[next.ethnicity])
-          return state[next.ethnicity];
+          return state[next.ethnicity] &&
+            next.height >= (height[0] + 140) && next.height <= (height[1] + 140);
         })
       };
 
@@ -69,7 +73,7 @@ function App() {
 
   const classes = useStyles();
 
-  const filtered = applyFilters(state);
+  const filtered = applyFilters(state, height);
 
   const items = filtered.map(club => {
     const members = club.filtered.map(member => (
@@ -99,6 +103,13 @@ function App() {
 
   const handleChange = name => event => {
     setState({ ...state, [name]: event.target.checked });
+  };
+
+  const handleChangeHeight = (event, newValue) => {
+    setHeight(newValue);
+  };
+  const handleChangeAge = (event, newValue) => {
+    setAge(newValue);
   };
 
 
@@ -147,6 +158,10 @@ function App() {
               />
             </FormGroup>
           </FormControl>
+          <h4>Height</h4>
+          <Slider value={height} onChange={handleChangeHeight} />
+          <h4>Age</h4>
+          <Slider value={age} onChange={handleChangeAge} />
 
           {/* <FormControl component="fieldset" className={classes.formControl}>
             <FormLabel component="legend">Ethnicity</FormLabel>

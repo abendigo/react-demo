@@ -39,6 +39,7 @@ function generateRandomMember() {
   return {
     name: randomItem(name),
     ethnicity: randomItem(enthicity),
+    height: 140 + random(70),
     icon: randomItem(icon)
   }
 }
